@@ -7,11 +7,10 @@ EXEC=sajranda
 
 CC=g++
 CFLAGS=
-#CFLAGS=`pkg-config QtCore --cflags`
 
 LD=ld
 LFLAGS=
-#LFLAGS=`pkg-config QtCore --libs`
+LFLAGS+=-lsfml-graphics -lsfml-window -lsfml-system
 
 ifdef profile
 CFLAGS+=-pg
