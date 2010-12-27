@@ -31,6 +31,8 @@ using sf::VideoMode;
 using sf::Event;
 using sf::Color;
 
+#include "model.hpp"
+
 union ldtob
 { //{{{
 	long double in;
@@ -46,6 +48,14 @@ int main( int argc, char** argv )
 
 	bool done = false;
 	Event* mEvent = new Event;
+	Model mModel;
+	mModel.makeOne();
+
+	glMatrixMode( GL_PROJECTION );
+	glLoadIdentity();
+	glOrtho( -400, 400, 300, -300, -1, 1 );
+	glMatrixMode( GL_MODELVIEW );
+
 	while( mGame->IsOpened() && !done )
 	{
 		while( mGame->GetEvent( *mEvent ) )
@@ -55,6 +65,9 @@ int main( int argc, char** argv )
 		}
 
 		mGame->Clear( Color::White );
+
+		mModel.render();
+
 		mGame->Display();
 	}
 
