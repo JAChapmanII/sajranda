@@ -54,6 +54,9 @@ class Model
 		Model();
 
 		void render() const;
+		void update();
+
+		void setDestination( long double nX, long double nY );
 
 		void buildModel();
 		void makeOne();
@@ -62,6 +65,7 @@ class Model
 		// points are stored in polar coordinates
 		PointVector points;
 		long double theta;
+		long double radialVelocity;
 		RectangularPoint center;
 		RectangularPoint destination;
 		bool isBuilt;

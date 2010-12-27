@@ -21,6 +21,7 @@
 using std::cout;
 using std::cin;
 using std::endl;
+using std::cerr;
 
 #include <fstream>
 using std::ofstream;
@@ -62,10 +63,17 @@ int main( int argc, char** argv )
 		{
 			if( mEvent->Type == Event::Closed )
 				mGame->Close();
+			if( mEvent->Type == Event::MouseMoved )
+			{
+				sf::Vector2f sCoords =
+					mGame->ConvertCoords( mEvent->MouseMove.X, mEvent->MouseMove.Y );
+				mModel.setDestination( sCoords.x - 400, sCoords.y - 300 );
+			}
 		}
 
 		mGame->Clear( Color::White );
 
+		mModel.update();
 		mModel.render();
 
 		mGame->Display();

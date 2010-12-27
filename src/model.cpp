@@ -22,11 +22,18 @@
 #include <GL/gl.h>
 #include <cmath>
 
+#include <iostream>
+using std::cerr;
+using std::endl;
+
 static const long double PI = 3.1415926535898;
 
 Model::Model() :
 	points(),
-	theta( 0.0f ),
+	theta( PI / 4 ),
+	radialVelocity( 0.0f ),
+	center( 0.0, 0.0 ),
+	destination( 0.0, 0.0 ),
 	isBuilt( false )
 {
 }
@@ -44,6 +51,33 @@ void Model::render() const
 				10.0f * (*point)->r * sin( (*point)->theta + this->theta ), 0.0f );
 	}
 	glEnd();
+}
+
+void Model::update()
+{
+	while( this->theta > 4*PI )
+		this->theta -= 2*PI;
+	while( this->theta < -4*PI )
+		this->theta += 2*PI;
+
+	RectangularPoint locDest(
+			this->destination.x - this->center.x,
+			this->destination.y - this->center.y );
+	long double delta = sqrt( locDest.x * locDest.x + locDest.y * locDest.y );
+	if( delta < 0.00001 && delta > -0.00001 )
+		return;
+	long double destinationTheta = acos( locDest.x / delta );
+	if( locDest.y < 0 )
+		destinationTheta = 2*PI - destinationTheta;
+	this->radialVelocity = (destinationTheta - this->theta) / 10.0f;
+
+	this->theta += this->radialVelocity;
+}
+
+void Model::setDestination( long double iX, long double iY )
+{
+	this->destination.x = iX;
+	this->destination.y = iY;
 }
 
 void Model::buildModel()
