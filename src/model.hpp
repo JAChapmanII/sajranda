@@ -67,6 +67,7 @@ class Model
 		long double theta;
 		long double radialVelocity;
 		RectangularPoint center;
+		RectangularPoint velocity;
 		RectangularPoint destination;
 		bool isBuilt;
 };

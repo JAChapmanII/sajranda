@@ -33,6 +33,7 @@ Model::Model() :
 	theta( PI / 4 ),
 	radialVelocity( 0.0f ),
 	center( 0.0, 0.0 ),
+	velocity( 0.0, 0.0 ),
 	destination( 0.0, 0.0 ),
 	isBuilt( false )
 {
@@ -47,17 +48,17 @@ void Model::render() const
 		point != this->points.end(); ++point )
 	{
 		glVertex3f(
-				10.0f * (*point)->r * cos( (*point)->theta + this->theta ),
-				10.0f * (*point)->r * sin( (*point)->theta + this->theta ), 0.0f );
+			(*point)->r * cos( (*point)->theta + this->theta ) + this->center.x,
+			(*point)->r * sin( (*point)->theta + this->theta ) + this->center.y, 0.0f );
 	}
 	glEnd();
 }
 
 void Model::update()
 {
-	while( this->theta > 4*PI )
+	while( this->theta > 2*PI )
 		this->theta -= 2*PI;
-	while( this->theta < -4*PI )
+	while( this->theta < 0 )
 		this->theta += 2*PI;
 
 	RectangularPoint locDest(
@@ -69,9 +70,24 @@ void Model::update()
 	long double destinationTheta = acos( locDest.x / delta );
 	if( locDest.y < 0 )
 		destinationTheta = 2*PI - destinationTheta;
-	this->radialVelocity = (destinationTheta - this->theta) / 10.0f;
+	while( destinationTheta > 2*PI )
+		destinationTheta -= 2*PI;
+	while( destinationTheta < 0 )
+		destinationTheta += 2*PI;
+	this->radialVelocity = (destinationTheta - this->theta) / 5.0f;
+	if(( destinationTheta < this->theta - PI ) ||
+		( destinationTheta > this->theta + PI ))
+		this->radialVelocity = -this->radialVelocity;
+
+	if( this->radialVelocity < 0.004 && this->radialVelocity > -0.004 )
+		this->radialVelocity = destinationTheta - this->theta;
+
+	this->velocity.x = locDest.x / 25.0f;
+	this->velocity.y = locDest.y / 25.0f;
 
 	this->theta += this->radialVelocity;
+	this->center.x += this->velocity.x;
+	this->center.y += this->velocity.y;
 }
 
 void Model::setDestination( long double iX, long double iY )
@@ -87,11 +103,12 @@ void Model::buildModel()
 void Model::makeOne()
 {
 	this->points.clear();
-	this->points.push_back( new Model::PolarPoint( 0, 2.0 ) );
-	this->points.push_back( new Model::PolarPoint( PI / 2, 1.0 ) );
-	this->points.push_back( new Model::PolarPoint( 7 * PI / 8, 1.5 ) );
-	this->points.push_back( new Model::PolarPoint( 9 * PI / 8, 1.5 ) );
-	this->points.push_back( new Model::PolarPoint( 3 * PI / 2, 1.0 ) );
-	this->points.push_back( new Model::PolarPoint( 0, 2.0 ) );
+	static const long double radiusM = 10.0;
+	this->points.push_back( new Model::PolarPoint( 0, 2.0 * radiusM ) );
+	this->points.push_back( new Model::PolarPoint( PI / 2, 1.0 * radiusM ) );
+	this->points.push_back( new Model::PolarPoint( 7 * PI / 8, 1.5 * radiusM ) );
+	this->points.push_back( new Model::PolarPoint( 9 * PI / 8, 1.5 * radiusM ) );
+	this->points.push_back( new Model::PolarPoint( 3 * PI / 2, 1.0 * radiusM ) );
+	this->points.push_back( new Model::PolarPoint( 0, 2.0 * radiusM ) );
 }
 

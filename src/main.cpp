@@ -45,7 +45,8 @@ void makeModel();
 int main( int argc, char** argv )
 { //{{{
 	RenderWindow* mGame =
-		new RenderWindow( VideoMode( 800, 600 ), "sajranda", sf::Style::Close );
+		new RenderWindow( VideoMode( 1920, 1080 ), "sajranda", sf::Style::Close );
+	mGame->SetFramerateLimit( 60 );
 
 	bool done = false;
 	Event* mEvent = new Event;
@@ -54,7 +55,7 @@ int main( int argc, char** argv )
 
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
-	glOrtho( -400, 400, 300, -300, -1, 1 );
+	glOrtho( -960, 960, 540, -540, -1, 1 );
 	glMatrixMode( GL_MODELVIEW );
 
 	while( mGame->IsOpened() && !done )
@@ -67,7 +68,14 @@ int main( int argc, char** argv )
 			{
 				sf::Vector2f sCoords =
 					mGame->ConvertCoords( mEvent->MouseMove.X, mEvent->MouseMove.Y );
-				mModel.setDestination( sCoords.x - 400, sCoords.y - 300 );
+				mModel.setDestination( sCoords.x - 960, sCoords.y - 540 );
+			}
+			if( mEvent->Type == Event::KeyPressed )
+			{
+				if( mEvent->Key.Code == sf::Key::Escape )
+				{
+					mGame->Close();
+				}
 			}
 		}
 
