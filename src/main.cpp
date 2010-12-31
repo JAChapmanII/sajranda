@@ -51,7 +51,7 @@ int main( int argc, char** argv )
 	bool done = false;
 	Event* mEvent = new Event;
 	Model mModel;
-	mModel.makeOne();
+	mModel.makeHardCoded( 1 );
 
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();

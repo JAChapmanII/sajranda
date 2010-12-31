@@ -59,7 +59,7 @@ class Model
 		void setDestination( long double nX, long double nY );
 
 		void buildModel();
-		void makeOne();
+		void makeHardCoded( unsigned int number = 0 );
 
 	private:
 		// points are stored in polar coordinates

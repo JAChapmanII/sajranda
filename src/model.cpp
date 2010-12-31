@@ -18,6 +18,8 @@
  *
  */ //}}}
 #include "model.hpp"
+//using Model::PolarPoint;
+//using Model::RectangularPoint;
 
 #include <GL/gl.h>
 #include <cmath>
@@ -100,15 +102,39 @@ void Model::buildModel()
 {
 }
 
-void Model::makeOne()
+void Model::makeHardCoded( unsigned int number )
 {
 	this->points.clear();
-	static const long double radiusM = 10.0;
-	this->points.push_back( new Model::PolarPoint( 0, 2.0 * radiusM ) );
-	this->points.push_back( new Model::PolarPoint( PI / 2, 1.0 * radiusM ) );
-	this->points.push_back( new Model::PolarPoint( 7 * PI / 8, 1.5 * radiusM ) );
-	this->points.push_back( new Model::PolarPoint( 9 * PI / 8, 1.5 * radiusM ) );
-	this->points.push_back( new Model::PolarPoint( 3 * PI / 2, 1.0 * radiusM ) );
-	this->points.push_back( new Model::PolarPoint( 0, 2.0 * radiusM ) );
+	static const long double radiusM = 25.0;
+
+	switch( number )
+	{
+		case 0:
+		{
+			this->points.push_back( new PolarPoint( 0, 2.0 * radiusM ) );
+			this->points.push_back( new PolarPoint( PI / 2, 1.0 * radiusM ) );
+			this->points.push_back( new PolarPoint( 7 * PI / 8, 1.5 * radiusM ) );
+			this->points.push_back( new PolarPoint( 9 * PI / 8, 1.5 * radiusM ) );
+			this->points.push_back( new PolarPoint( 3 * PI / 2, 1.0 * radiusM ) );
+			this->points.push_back( new PolarPoint( 0, 2.0 * radiusM ) );
+			break;
+		}
+		case 1:
+		{
+			this->points.push_back( new PolarPoint(  0, 2.0 * radiusM ) );
+			this->points.push_back( new PolarPoint(  5 * PI / 4, 1.0 * radiusM ) );
+			this->points.push_back( new PolarPoint( -1 * PI / 3, 1.0 * radiusM ) );
+			this->points.push_back( new PolarPoint( -3 * PI / 5, 1.5 * radiusM ) );
+			this->points.push_back( new PolarPoint( -7 * PI / 8, 1.5 * radiusM ) );
+			this->points.push_back( new PolarPoint(  7 * PI / 8, 1.5 * radiusM ) );
+			this->points.push_back( new PolarPoint(  3 * PI / 5, 1.5 * radiusM ) );
+			this->points.push_back( new PolarPoint(  1 * PI / 3, 1.0 * radiusM ) );
+			this->points.push_back( new PolarPoint( -5 * PI / 4, 1.0 * radiusM ) );
+			this->points.push_back( new PolarPoint(  0, 2.0 * radiusM ) );
+			break;
+		}
+		default:
+			break;
+	}
 }
 
