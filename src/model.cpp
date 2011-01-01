@@ -21,7 +21,9 @@
 //using Model::PolarPoint;
 //using Model::RectangularPoint;
 
-#include <GL/gl.h>
+// gives access to opengl commands
+#include <SFML/Window.hpp>
+
 #include <cmath>
 
 #include <iostream>
