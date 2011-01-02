@@ -26,7 +26,7 @@ class Model
 {
 	public:
 		struct PolarPoint
-		{
+		{ //{{{
 			long double theta;
 			long double r;
 
@@ -35,10 +35,10 @@ class Model
 				r( iR )
 			{
 			}
-		};
+		}; //}}}
 
 		struct RectangularPoint
-		{
+		{ //{{{
 			long double x;
 			long double y;
 
@@ -47,7 +47,7 @@ class Model
 				y( iY )
 			{
 			}
-		};
+		}; //}}}
 
 		typedef std::vector< PolarPoint* > PointVector;
 
