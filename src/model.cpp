@@ -30,10 +30,12 @@
 using std::cerr;
 using std::endl;
 
+static const long double T_PI = 6.2831853071796;
 static const long double PI = 3.1415926535898;
+static const long double PI_2 = 1.5707963267949;
 
 Model::Model() :
-	points(),
+	points(), //{{{
 	theta( PI / 4 ),
 	radialVelocity( 0.0f ),
 	center( 0.0, 0.0 ),
@@ -41,10 +43,10 @@ Model::Model() :
 	destination( 0.0, 0.0 ),
 	isBuilt( false )
 {
-}
+} //}}}
 
 void Model::render() const
-{
+{ //{{{
 	glLineWidth( 2.0f );
 	glBegin( GL_LINE_STRIP );
 	glColor3f( 0.0f, 0.0f, 0.0f );
@@ -56,15 +58,10 @@ void Model::render() const
 			(*point)->r * sin( (*point)->theta + this->theta ) + this->center.y, 0.0f );
 	}
 	glEnd();
-}
+} //}}}
 
 void Model::update()
 {
-	while( this->theta > 2*PI )
-		this->theta -= 2*PI;
-	while( this->theta < 0 )
-		this->theta += 2*PI;
-
 	RectangularPoint locDest(
 			this->destination.x - this->center.x,
 			this->destination.y - this->center.y );
@@ -78,36 +75,48 @@ void Model::update()
 		destinationTheta -= 2*PI;
 	while( destinationTheta < 0 )
 		destinationTheta += 2*PI;
-	this->radialVelocity = (destinationTheta - this->theta) / 5.0f;
-	if(( destinationTheta < this->theta - PI ) ||
-		( destinationTheta > this->theta + PI ))
-		this->radialVelocity = -this->radialVelocity;
 
-	if( this->radialVelocity < 0.004 && this->radialVelocity > -0.004 )
-		this->radialVelocity = destinationTheta - this->theta;
+
+	long double forward = (destinationTheta - this->theta);
+	long double backward = (destinationTheta + T_PI - this->theta);
+	if( fabs( forward ) <= fabs( backward ) )
+		this->radialVelocity = forward;
+	else
+		this->radialVelocity = backward;
+	if( destinationTheta > this->theta + PI )
+		this->radialVelocity = (destinationTheta - T_PI) - this->theta;
+
+
+	if( this->radialVelocity > 0.02 || this->radialVelocity < -0.02 )
+		this->radialVelocity /= 5.0f;
 
 	this->velocity.x = locDest.x / 25.0f;
 	this->velocity.y = locDest.y / 25.0f;
 
 	this->theta += this->radialVelocity;
+	while( this->theta > 2*PI )
+		this->theta -= 2*PI;
+	while( this->theta < 0 )
+		this->theta += 2*PI;
+
 	this->center.x += this->velocity.x;
 	this->center.y += this->velocity.y;
 }
 
 void Model::setDestination( long double iX, long double iY )
-{
+{ //{{{
 	this->destination.x = iX;
 	this->destination.y = iY;
-}
+} //}}}
 
 void Model::buildModel()
 {
 }
 
 void Model::makeHardCoded( unsigned int number )
-{
+{ //{{{
 	this->points.clear();
-	static const long double radiusM = 25.0;
+	static const long double radiusM = 15.0;
 
 	switch( number )
 	{
@@ -138,5 +147,5 @@ void Model::makeHardCoded( unsigned int number )
 		default:
 			break;
 	}
-}
+} //}}}
 
