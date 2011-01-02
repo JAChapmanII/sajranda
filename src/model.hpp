@@ -70,6 +70,7 @@ class Model
 		RectangularPoint velocity;
 		RectangularPoint destination;
 		bool isBuilt;
+		bool reflect;
 };
 
 #endif // MODEL_HPP

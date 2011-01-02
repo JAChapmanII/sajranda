@@ -41,21 +41,32 @@ Model::Model() :
 	center( 0.0, 0.0 ),
 	velocity( 0.0, 0.0 ),
 	destination( 0.0, 0.0 ),
-	isBuilt( false )
+	isBuilt( false ),
+	reflect( true )
 {
 } //}}}
 
 void Model::render() const
 { //{{{
-	glLineWidth( 2.0f );
+	glLineWidth( 1.5f );
 	glBegin( GL_LINE_STRIP );
-	glColor3f( 0.0f, 0.0f, 0.0f );
-	for( Model::PointVector::const_iterator point = this->points.begin();
+	glColor3f( 1.000f, 0.086f, 0.086f );
+	for( PointVector::const_iterator point = this->points.begin();
 		point != this->points.end(); ++point )
 	{
-		glVertex3f(
+		glVertex2f(
 			(*point)->r * cos( (*point)->theta + this->theta ) + this->center.x,
-			(*point)->r * sin( (*point)->theta + this->theta ) + this->center.y, 0.0f );
+			(*point)->r * sin( (*point)->theta + this->theta ) + this->center.y );
+	}
+	if( reflect )
+	{
+		for( PointVector::const_reverse_iterator point = this->points.rbegin();
+			point != this->points.rend(); ++point )
+		{
+			glVertex2f(
+				(*point)->r * cos( -(*point)->theta + this->theta ) + this->center.x,
+				(*point)->r * sin( -(*point)->theta + this->theta ) + this->center.y );
+		}
 	}
 	glEnd();
 } //}}}
@@ -116,7 +127,7 @@ void Model::buildModel()
 void Model::makeHardCoded( unsigned int number )
 { //{{{
 	this->points.clear();
-	static const long double radiusM = 15.0;
+	static const long double radiusM = 30.0;
 
 	switch( number )
 	{
@@ -125,9 +136,6 @@ void Model::makeHardCoded( unsigned int number )
 			this->points.push_back( new PolarPoint( 0, 2.0 * radiusM ) );
 			this->points.push_back( new PolarPoint( PI / 2, 1.0 * radiusM ) );
 			this->points.push_back( new PolarPoint( 7 * PI / 8, 1.5 * radiusM ) );
-			this->points.push_back( new PolarPoint( 9 * PI / 8, 1.5 * radiusM ) );
-			this->points.push_back( new PolarPoint( 3 * PI / 2, 1.0 * radiusM ) );
-			this->points.push_back( new PolarPoint( 0, 2.0 * radiusM ) );
 			break;
 		}
 		case 1:
@@ -137,11 +145,18 @@ void Model::makeHardCoded( unsigned int number )
 			this->points.push_back( new PolarPoint( -1 * PI / 3, 1.0 * radiusM ) );
 			this->points.push_back( new PolarPoint( -3 * PI / 5, 1.5 * radiusM ) );
 			this->points.push_back( new PolarPoint( -7 * PI / 8, 1.5 * radiusM ) );
-			this->points.push_back( new PolarPoint(  7 * PI / 8, 1.5 * radiusM ) );
-			this->points.push_back( new PolarPoint(  3 * PI / 5, 1.5 * radiusM ) );
-			this->points.push_back( new PolarPoint(  1 * PI / 3, 1.0 * radiusM ) );
-			this->points.push_back( new PolarPoint( -5 * PI / 4, 1.0 * radiusM ) );
-			this->points.push_back( new PolarPoint(  0, 2.0 * radiusM ) );
+			break;
+		}
+		case 2:
+		{
+			this->points.push_back( new PolarPoint( 0.0, 2.0 * radiusM ) );
+			this->points.push_back( new PolarPoint( PI / 12, 13 * radiusM / 8 ) );
+			this->points.push_back( new PolarPoint( PI_2, 2 * radiusM / 8 ) );
+			this->points.push_back( new PolarPoint( 5 * PI / 24, 14 * radiusM / 8 ) );
+			this->points.push_back( new PolarPoint( 9 * PI / 24, 14 * radiusM / 8 ) );
+			this->points.push_back( new PolarPoint( 15 * PI / 24, 14 * radiusM / 8 ) );
+			this->points.push_back( new PolarPoint( 19 * PI / 24, 14 * radiusM / 8 ) );
+			this->points.push_back( new PolarPoint( 22 * PI / 24, 13 * radiusM / 8 ) );
 			break;
 		}
 		default:
