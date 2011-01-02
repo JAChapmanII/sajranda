@@ -1,0 +1,58 @@
+sajranda is going to be an game in the RTS genre, right now it is nothing
+
+"sajranda" is a lojban word for "conscious surrender" which is meant to
+emphasize the (eventually/hopefully) large number of options for diplomacy, and
+allowing various factions to surrender only parts of control from their empire.
+
+Compiling:
+	Debug version:
+		make
+
+	Release version:
+		make release=yes
+
+	Note: To switch from a debug to a release version, run
+		make clean
+	in between them.
+
+	There are other options, but you should only need them if you are a
+	developer, in which case you know how to read a Makefile
+
+Running:
+	./bin/sajranda
+
+File formats:
+	*.model
+		Binary format, which currently consists of a byte and long double's
+		First is a single byte:
+			The MSB (high bit) is used as a bool flag determing whether or not this
+			mesh is symmetrical. If it is, it is assumed half the mesh is given
+			The last seven bits are the number of points expected in the model. A
+			max of 127 is imposed by the number of bits in this value
+		The first three long doubles are the r, g, and b parts of the mesh color
+		Next are a series of zero or more points (using polar coordinates):
+			The first long double of a point is the theta (in radians / pi)
+			The second long double is the radius length of this point
+
+		Note: if the number of points does not match the number in the byte
+		header, an error will be thrown
+
+	*.in
+		This is a human editable format used to hand-make models. Each of these
+		are compiled upon first use for speed/efficiency on later loads.
+		This format closely resembles the *.model format it compiles into.
+
+		The first letter should be a 'y' or 'n' (case insensitive). The word this
+		letter is attached to is thrown away to allow for "yes", "no", etc. This
+		is mapped to a boolean value telling wether or not this model is symmetric
+
+		Next is a non-negative integer that should be <= 127. It is read % 128.
+		This is the number of points that should be after this in the file.
+
+		Next is a series of points in polar coordinates
+			the first long double read will be used as theta (in radians / pi)
+			the second is the radius length (in units)
+
+		If the number of points read does not match the number from the header,
+		and error will be thrown and the file will not be compiled
+
