@@ -44,8 +44,11 @@ void makeModel();
 
 int main( int argc, char** argv )
 { //{{{
+	static const float gWidth = 960;
+	static const float gHeight = 540;
 	RenderWindow* mGame =
-		new RenderWindow( VideoMode( 1920, 1080 ), "sajranda", sf::Style::Close );
+		new RenderWindow(
+			VideoMode( gWidth, gHeight ), "sajranda", sf::Style::Close );
 	mGame->SetFramerateLimit( 60 );
 
 	bool done = false;
@@ -55,7 +58,10 @@ int main( int argc, char** argv )
 
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
-	glOrtho( -960, 960, 540, -540, -1, 1 );
+	glOrtho(
+		-(gWidth / 2.0f), (gWidth / 2.0f),
+		(gHeight / 2.0f), -(gHeight / 2.0f),
+		-1, 1 );
 	glMatrixMode( GL_MODELVIEW );
 
 	while( mGame->IsOpened() && !done )
@@ -68,7 +74,8 @@ int main( int argc, char** argv )
 			{
 				sf::Vector2f sCoords =
 					mGame->ConvertCoords( mEvent->MouseMove.X, mEvent->MouseMove.Y );
-				mModel.setDestination( sCoords.x - 960, sCoords.y - 540 );
+				mModel.setDestination(
+					sCoords.x - (gWidth / 2.0f), sCoords.y - (gHeight / 2.0f) );
 			}
 			if( mEvent->Type == Event::KeyPressed )
 			{
