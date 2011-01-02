@@ -72,7 +72,7 @@ void Model::render() const
 } //}}}
 
 void Model::update()
-{
+{ //{{{
 	RectangularPoint locDest(
 			this->destination.x - this->center.x,
 			this->destination.y - this->center.y );
@@ -109,7 +109,7 @@ void Model::update()
 
 	this->center.x += this->velocity.x;
 	this->center.y += this->velocity.y;
-}
+} //}}}
 
 void Model::setDestination( long double iX, long double iY )
 { //{{{
