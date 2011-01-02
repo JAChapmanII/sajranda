@@ -54,7 +54,7 @@ int main( int argc, char** argv )
 	bool done = false;
 	Event* mEvent = new Event;
 	Model mModel;
-	mModel.makeHardCoded( 1 );
+	mModel.makeHardCoded( 0 );
 
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
@@ -72,6 +72,9 @@ int main( int argc, char** argv )
 				mGame->Close();
 			if( mEvent->Type == Event::MouseMoved )
 			{
+				if(( mEvent->MouseMove.X < 0 || mEvent->MouseMove.X > gWidth ) ||
+					( mEvent->MouseMove.Y < 0 || mEvent->MouseMove.Y > gHeight ))
+					continue;
 				sf::Vector2f sCoords =
 					mGame->ConvertCoords( mEvent->MouseMove.X, mEvent->MouseMove.Y );
 				mModel.setDestination(
