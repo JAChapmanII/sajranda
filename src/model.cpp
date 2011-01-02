@@ -88,14 +88,11 @@ void Model::update()
 		destinationTheta += 2*PI;
 
 
-	long double forward = (destinationTheta - this->theta);
-	long double backward = (destinationTheta + T_PI - this->theta);
-	if( fabs( forward ) <= fabs( backward ) )
-		this->radialVelocity = forward;
-	else
-		this->radialVelocity = backward;
-	if( destinationTheta > this->theta + PI )
-		this->radialVelocity = (destinationTheta - T_PI) - this->theta;
+	this->radialVelocity = destinationTheta - this->theta;
+	if( this->theta + PI < destinationTheta )
+		this->radialVelocity -= T_PI;
+	else if( this->theta - PI > destinationTheta )
+		this->radialVelocity += T_PI;
 
 
 	if( this->radialVelocity > 0.02 || this->radialVelocity < -0.02 )
