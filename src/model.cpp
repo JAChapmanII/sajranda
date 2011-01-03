@@ -18,13 +18,19 @@
  *
  */ //}}}
 #include "model.hpp"
-//using Model::PolarPoint;
-//using Model::RectangularPoint;
+using std::string;
 
-// gives access to opengl commands
+#include <fstream>
+using std::ifstream;
+using std::ofstream;
+
 #include <SFML/Window.hpp>
 
 #include <cmath>
+
+#include "util.hpp"
+using util::fileExists;
+using util::ldtob;
 
 #include <iostream>
 using std::cerr;
@@ -41,6 +47,7 @@ Model::Model() :
 	center( 0.0, 0.0 ),
 	velocity( 0.0, 0.0 ),
 	destination( 0.0, 0.0 ),
+	color( 0.0, 0.0, 0.0 ),
 	isBuilt( false ),
 	reflect( true )
 {
@@ -121,43 +128,149 @@ void Model::buildModel()
 {
 }
 
-void Model::makeHardCoded( unsigned int number )
+bool Model::compileModel( string fileName )
 { //{{{
-	this->points.clear();
-	static const long double radiusM = 30.0;
-
-	switch( number )
+	if( !fileExists( fileName + ".in" ) )
 	{
-		case 0:
-		{
-			this->points.push_back( new PolarPoint( 0, 2.0 * radiusM ) );
-			this->points.push_back( new PolarPoint( PI / 2, 1.0 * radiusM ) );
-			this->points.push_back( new PolarPoint( 7 * PI / 8, 1.5 * radiusM ) );
-			break;
-		}
-		case 1:
-		{
-			this->points.push_back( new PolarPoint(  0, 2.0 * radiusM ) );
-			this->points.push_back( new PolarPoint(  5 * PI / 4, 1.0 * radiusM ) );
-			this->points.push_back( new PolarPoint( -1 * PI / 3, 1.0 * radiusM ) );
-			this->points.push_back( new PolarPoint( -3 * PI / 5, 1.5 * radiusM ) );
-			this->points.push_back( new PolarPoint( -7 * PI / 8, 1.5 * radiusM ) );
-			break;
-		}
-		case 2:
-		{
-			this->points.push_back( new PolarPoint( 0.0, 2.0 * radiusM ) );
-			this->points.push_back( new PolarPoint( PI / 12, 13 * radiusM / 8 ) );
-			this->points.push_back( new PolarPoint( PI_2, 2 * radiusM / 8 ) );
-			this->points.push_back( new PolarPoint( 5 * PI / 24, 14 * radiusM / 8 ) );
-			this->points.push_back( new PolarPoint( 9 * PI / 24, 14 * radiusM / 8 ) );
-			this->points.push_back( new PolarPoint( 15 * PI / 24, 14 * radiusM / 8 ) );
-			this->points.push_back( new PolarPoint( 19 * PI / 24, 14 * radiusM / 8 ) );
-			this->points.push_back( new PolarPoint( 22 * PI / 24, 13 * radiusM / 8 ) );
-			break;
-		}
-		default:
-			break;
+		cerr << "In file " << fileName << " does not exist" << endl;
+		return false;
 	}
+
+	ifstream inFile( (fileName + ".in").c_str() );
+	ofstream outFile( (fileName + ".model").c_str(), std::ios::binary );
+
+	char header = 0x00;
+	string firstWord;
+	inFile >> firstWord;
+	if( firstWord[ 0 ] == 'y' || firstWord[ 0 ] == 'Y' )
+	{
+		header |= 0x80;
+	}
+	else if( firstWord[ 0 ] != 'n' && firstWord[ 0 ] != 'N' )
+	{
+		cerr << "The first character of " << fileName << ".in is invalid" << endl;
+		inFile.close();
+		outFile.close();
+		return false;
+	}
+
+	int totalPoints = 0;
+	inFile >> totalPoints;
+	if( !inFile.good() )
+	{
+		cerr << "Could not read number of points from " << fileName << ".in" << endl;
+		inFile.close();
+		outFile.close();
+		return false;
+	}
+	totalPoints %= 128;
+
+	header |= totalPoints;
+	outFile.write( &header, 1 );
+
+	long double r = 0, g = 0, b = 0;
+	inFile >> r;
+	inFile >> g;
+	inFile >> b;
+	if( !inFile.good() )
+	{
+		cerr << "Could not read color from " << fileName << ".in" << endl;
+		inFile.close();
+		outFile.close();
+		return false;
+	}
+
+	ldtob converter;
+
+	converter.in = r;
+	outFile.write( converter.out, sizeof( long double ) );
+	converter.in = g;
+	outFile.write( converter.out, sizeof( long double ) );
+	converter.in = b;
+	outFile.write( converter.out, sizeof( long double ) );
+
+	long double theta = 0;
+	for( int i = 0; i < totalPoints; ++i )
+	{
+		inFile >> r; inFile >> theta;
+		if( !inFile.good() )
+		{
+			cerr << "Error reading " << fileName << ".in on point " << i << endl;
+			inFile.close();
+			outFile.close();
+			return false;
+		}
+
+		converter.in = r;
+		outFile.write( converter.out, sizeof( long double ) );
+
+		converter.in = theta;
+		outFile.write( converter.out, sizeof( long double ) );
+	}
+
+	inFile.close();
+	outFile.close();
+	return true;
+} //}}}
+
+bool Model::loadModel( string fileName )
+{ //{{{
+	if( !fileExists( fileName + ".model" ) )
+	{
+		cerr << "Model " << fileName << " does not exist, attempting compiling" << endl;
+		if( ! Model::compileModel( fileName ) )
+			return false;
+	}
+
+
+	ifstream inFile( (fileName + ".model").c_str(), std::ios::binary );
+	char header = 0;
+	inFile.read( &header, 1 );
+
+	if( header & 0x80 )
+		this->reflect = true;
+	else
+		this->reflect = false;
+
+	int totalPoints = header & 0x7f;
+	this->points.clear();
+	this->points.reserve( totalPoints );
+
+	ldtob converter;
+	inFile.read( converter.out, sizeof( long double ) );
+	this->color.r = converter.in;
+	inFile.read( converter.out, sizeof( long double ) );
+	this->color.g = converter.in;
+	inFile.read( converter.out, sizeof( long double ) );
+	this->color.b = converter.in;
+
+	if( !inFile.good() )
+	{
+		cerr << "Colud not load color from " << fileName << ".model" << endl;
+		inFile.close();
+		return false;
+	}
+
+	long double r = 0, theta = 0;
+	static const long double radiusM = 15.0f;
+	for( int i = 0; i < totalPoints; ++i )
+	{
+		inFile.read( converter.out, sizeof( long double ) );
+		theta = converter.in;
+		inFile.read( converter.out, sizeof( long double ) );
+		r = converter.in * radiusM;
+
+		if( !inFile.good() )
+		{
+			cerr << "Error reading " << fileName << ".model on point " << i << endl;
+			inFile.close();
+			return false;
+		}
+
+		this->points.push_back( new PolarPoint( theta * PI, r ) );
+	}
+
+	cerr << "Success, loaded " << this->points.size() << " points" << endl;
+	return true;
 } //}}}
 

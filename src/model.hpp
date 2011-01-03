@@ -21,6 +21,7 @@
 #define MODEL_HPP
 
 #include <vector>
+#include <string>
 
 class Model
 {
@@ -49,17 +50,42 @@ class Model
 			}
 		}; //}}}
 
+		struct ColorPoint
+		{ //{{{
+			long double r;
+			long double g;
+			long double b;
+
+			ColorPoint( long double iR, long double iG, long double iB ) :
+				r( iR ),
+				g( iG ),
+				b( iB )
+			{
+			}
+		}; //}}}
+
 		typedef std::vector< PolarPoint* > PointVector;
 
+		// create an empty model
 		Model();
 
+		// renders this model
 		void render() const;
+
+		// updates this point's position and theta
 		void update();
 
+		// sets the destination of this model to a new point
 		void setDestination( long double nX, long double nY );
 
+		// builds the display list for this model
 		void buildModel();
-		void makeHardCoded( unsigned int number = 0 );
+
+		// compile a .in file into a .model file
+		static bool compileModel( std::string fileName );
+
+		// load a .model file into this, compiling if necessary
+		bool loadModel( std::string fileName );
 
 	private:
 		// points are stored in polar coordinates
@@ -69,6 +95,7 @@ class Model
 		RectangularPoint center;
 		RectangularPoint velocity;
 		RectangularPoint destination;
+		ColorPoint color;
 		bool isBuilt;
 		bool reflect;
 };
