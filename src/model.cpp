@@ -57,7 +57,7 @@ void Model::render() const
 { //{{{
 	glLineWidth( 1.5f );
 	glBegin( GL_LINE_STRIP );
-	glColor3f( 1.000f, 0.086f, 0.086f );
+	glColor3f( this->color.r, this->color.g, this->color.b );
 	for( PointVector::const_iterator point = this->points.begin();
 		point != this->points.end(); ++point )
 	{

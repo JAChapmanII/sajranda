@@ -26,6 +26,9 @@ using std::cerr;
 #include <fstream>
 using std::ofstream;
 
+#include <string>
+using std::string;
+
 #include <SFML/Graphics.hpp>
 using sf::RenderWindow;
 using sf::VideoMode;
@@ -33,6 +36,9 @@ using sf::Event;
 using sf::Color;
 
 #include "model.hpp"
+
+#include "util.hpp"
+using util::fileExists;
 
 int main( int argc, char** argv )
 { //{{{
@@ -46,7 +52,25 @@ int main( int argc, char** argv )
 	bool done = false;
 	Event* mEvent = new Event;
 	Model mModel;
-	mModel.loadModel( "dat/003" );
+	string fileName = "dat/003";
+	if( fileExists( fileName + ".model" ) )
+	{
+		if( ! mModel.loadModel( fileName ) )
+		{
+			cerr << "It appears " << fileName << ".model is corrupt, recompiling" << endl;
+			Model::compileModel( fileName );
+			if( ! mModel.loadModel( fileName ) )
+			{
+				cerr << "Model is still bad" << endl;
+				return -1;
+			}
+		}
+	}
+	else if( ! mModel.loadModel( fileName ) )
+	{
+		cerr << "Model is bad" << endl;
+		return -1;
+	}
 
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
