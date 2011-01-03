@@ -96,6 +96,7 @@ class Model
 		RectangularPoint velocity;
 		RectangularPoint destination;
 		ColorPoint color;
+		bool isSelected;
 		bool isBuilt;
 		bool reflect;
 };

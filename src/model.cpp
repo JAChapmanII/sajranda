@@ -48,6 +48,7 @@ Model::Model() :
 	velocity( 0.0, 0.0 ),
 	destination( 0.0, 0.0 ),
 	color( 0.0, 0.0, 0.0 ),
+	isSelected( true ),
 	isBuilt( false ),
 	reflect( true )
 {
@@ -55,6 +56,23 @@ Model::Model() :
 
 void Model::render() const
 { //{{{
+	if( this->isSelected ) // then draw a line from this->center to destination
+	{ //{{{
+		RectangularPoint locDest(
+			this->destination.x - this->center.x,
+			this->destination.y - this->center.y );
+		long double delta = sqrt( locDest.x * locDest.x + locDest.y * locDest.y );
+		if( delta > 10 )
+		{
+			glColor3f( 0.0, 0.0, 0.0 );
+			glLineWidth( 0.5f );
+			glBegin( GL_LINES );
+				glVertex2f( this->center.x, this->center.y );
+				glVertex2f( this->destination.x, this->destination.y );
+			glEnd();
+		}
+	} //}}}
+
 	glLineWidth( 1.5f );
 	glBegin( GL_LINE_STRIP );
 	glColor3f( this->color.r, this->color.g, this->color.b );
