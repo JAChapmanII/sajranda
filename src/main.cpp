@@ -49,7 +49,6 @@ int main( int argc, char** argv )
 			VideoMode( gWidth, gHeight ), "sajranda", sf::Style::Close );
 	mGame->SetFramerateLimit( 60 );
 
-	bool done = false;
 	Event* mEvent = new Event;
 	Model mModel;
 	string fileName = "dat/001";
@@ -80,15 +79,12 @@ int main( int argc, char** argv )
 		-1, 1 );
 	glMatrixMode( GL_MODELVIEW );
 
-	while( mGame->IsOpened() && !done )
+	while( mGame->IsOpened() )
 	{
 		while( mGame->GetEvent( *mEvent ) )
 		{
 			if( mEvent->Type == Event::Closed )
-			{
 				mGame->Close();
-				break;
-			}
 
 			if( mEvent->Type == Event::MouseButtonPressed )
 			{
@@ -112,6 +108,8 @@ int main( int argc, char** argv )
 				}
 			}
 		}
+		if( !mGame->IsOpened() )
+			break;
 
 		mGame->Clear( Color::White );
 
