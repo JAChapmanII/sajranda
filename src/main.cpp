@@ -34,14 +34,6 @@ using sf::Color;
 
 #include "model.hpp"
 
-union ldtob
-{ //{{{
-	long double in;
-	char out[ sizeof( long double ) ];
-}; //}}}
-
-void makeModel();
-
 int main( int argc, char** argv )
 { //{{{
 	static const float gWidth = 960;
@@ -54,7 +46,7 @@ int main( int argc, char** argv )
 	bool done = false;
 	Event* mEvent = new Event;
 	Model mModel;
-	mModel.makeHardCoded( 0 );
+	mModel.loadModel( "dat/003" );
 
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
@@ -97,22 +89,5 @@ int main( int argc, char** argv )
 		mGame->Display();
 	}
 
-} //}}}
-
-void makeModel()
-{ //{{{
-	cout << "Input long double: ";
-	long double ld;
-	cin >> ld;
-	cout << "= " << ld << endl;
-	ldtob converter;
-	converter.in = ld;
-
-	cout << "Outputting data to \"ld.out\"\n"
-		<< "size is " << sizeof( long double ) << " bytes\n";
-	ofstream fout( "ld.out", std::ios::binary | std::ios::out );
-	fout.write( converter.out, sizeof( long double ) );
-	fout.close();
-	cout << "Done\n";
 } //}}}
 
