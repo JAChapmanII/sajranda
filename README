@@ -21,6 +21,13 @@ Compiling:
 Running:
 	./bin/sajranda
 
+Usage:
+	There is not much to do right now. Currently though, there is a way to add
+	waypoints to the main ship's path. A new waypoint will be added whenever the
+	right mouse button is down. This means 60 per second will be added. About
+	1MiB of RAM will be taken up every 9 minutes through this process if no
+	waypoints are reached and deleted. Have fun :)
+
 File formats:
 	*.model
 		Binary format, which currently consists of a byte and long double's
