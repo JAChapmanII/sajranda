@@ -52,7 +52,7 @@ int main( int argc, char** argv )
 	bool done = false;
 	Event* mEvent = new Event;
 	Model mModel;
-	string fileName = "dat/003";
+	string fileName = "dat/001";
 	if( fileExists( fileName + ".model" ) )
 	{
 		if( ! mModel.loadModel( fileName ) )
@@ -62,7 +62,7 @@ int main( int argc, char** argv )
 			if( ! mModel.loadModel( fileName ) )
 			{
 				cerr << "Model is still bad" << endl;
-				return -1;
+				return 1;
 			}
 		}
 	}
@@ -85,17 +85,25 @@ int main( int argc, char** argv )
 		while( mGame->GetEvent( *mEvent ) )
 		{
 			if( mEvent->Type == Event::Closed )
-				mGame->Close();
-			if( mEvent->Type == Event::MouseMoved )
 			{
-				if(( mEvent->MouseMove.X < 0 || mEvent->MouseMove.X > gWidth ) ||
-					( mEvent->MouseMove.Y < 0 || mEvent->MouseMove.Y > gHeight ))
-					continue;
-				sf::Vector2f sCoords =
-					mGame->ConvertCoords( mEvent->MouseMove.X, mEvent->MouseMove.Y );
-				mModel.setDestination(
-					sCoords.x - (gWidth / 2.0f), sCoords.y - (gHeight / 2.0f) );
+				mGame->Close();
+				break;
 			}
+
+			if( mEvent->Type == Event::MouseButtonPressed )
+			{
+				if(( mEvent->MouseButton.X < 0 || mEvent->MouseButton.X > gWidth ) ||
+					( mEvent->MouseButton.Y < 0 || mEvent->MouseButton.Y > gHeight ))
+					continue;
+				if( mEvent->MouseButton.Button == sf::Mouse::Right )
+				{
+					sf::Vector2f sCoords = mGame->ConvertCoords(
+							mEvent->MouseButton.X, mEvent->MouseButton.Y );
+					mModel.setDestination(
+						sCoords.x - (gWidth / 2.0f), sCoords.y - (gHeight / 2.0f) );
+				}
+			}
+
 			if( mEvent->Type == Event::KeyPressed )
 			{
 				if( mEvent->Key.Code == sf::Key::Escape )
