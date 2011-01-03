@@ -120,6 +120,7 @@ void Model::update()
 	// if we've gotten to the waypoint, delete it
 	if( delta < 10 && delta > -10 )
 	{
+		delete this->place[ 1 ];
 		this->place.erase( ++this->place.begin() );
 		this->velocity.x = 0; this->velocity.y = 0;
 		// update again incase there is another one
