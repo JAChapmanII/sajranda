@@ -125,8 +125,8 @@ void Model::setDestination( long double iX, long double iY )
 } //}}}
 
 void Model::buildModel()
-{
-}
+{ //{{{
+} //}}}
 
 bool Model::compileModel( string fileName )
 { //{{{
@@ -251,12 +251,12 @@ bool Model::loadModel( string fileName )
 		return false;
 	}
 
-	long double r = 0, theta = 0;
+	long double r = 0, ttheta = 0;
 	static const long double radiusM = 15.0f;
 	for( int i = 0; i < totalPoints; ++i )
 	{
 		inFile.read( converter.out, sizeof( long double ) );
-		theta = converter.in;
+		ttheta = converter.in;
 		inFile.read( converter.out, sizeof( long double ) );
 		r = converter.in * radiusM;
 
@@ -267,10 +267,9 @@ bool Model::loadModel( string fileName )
 			return false;
 		}
 
-		this->points.push_back( new PolarPoint( theta * PI, r ) );
+		this->points.push_back( new PolarPoint( ttheta * PI, r ) );
 	}
 
-	cerr << "Success, loaded " << this->points.size() << " points" << endl;
 	return true;
 } //}}}
 
