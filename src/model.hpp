@@ -65,6 +65,7 @@ class Model
 		}; //}}}
 
 		typedef std::vector< PolarPoint* > PointVector;
+		typedef std::vector< RectangularPoint* > PlaceVector;
 
 		// create an empty model
 		Model();
@@ -77,6 +78,12 @@ class Model
 
 		// sets the destination of this model to a new point
 		void setDestination( long double nX, long double nY );
+
+		// adds a destination to this model's queue
+		void addDestination( long double nX, long double nY );
+
+		// clears all of this model's destinations
+		void clearDestination();
 
 		// builds the display list for this model
 		void buildModel();
@@ -92,9 +99,8 @@ class Model
 		PointVector points;
 		long double theta;
 		long double radialVelocity;
-		RectangularPoint center;
+		PlaceVector place;
 		RectangularPoint velocity;
-		RectangularPoint destination;
 		ColorPoint color;
 		bool isSelected;
 		bool isBuilt;

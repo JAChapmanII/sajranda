@@ -44,31 +44,40 @@ Model::Model() :
 	points(), //{{{
 	theta( PI / 4 ),
 	radialVelocity( 0.0f ),
-	center( 0.0, 0.0 ),
+	place(),
 	velocity( 0.0, 0.0 ),
-	destination( 0.0, 0.0 ),
 	color( 0.0, 0.0, 0.0 ),
 	isSelected( true ),
 	isBuilt( false ),
 	reflect( true )
 {
+	this->place.push_back( new RectangularPoint( 0.0f, 0.0f ) );
 } //}}}
 
 void Model::render() const
 { //{{{
-	if( this->isSelected ) // then draw a line from this->center to destination
+	if( this->isSelected && this->place.size() > 1 )
 	{ //{{{
-		RectangularPoint locDest(
-			this->destination.x - this->center.x,
-			this->destination.y - this->center.y );
-		long double delta = sqrt( locDest.x * locDest.x + locDest.y * locDest.y );
-		if( delta > 10 )
+		unsigned int start = 0;
+		long double delta = 0;
+
+		while( delta < 10 && start < this->place.size() )
+		{
+			++start;
+			RectangularPoint locDest(
+				this->place[ start ]->x - this->place[ 0 ]->x,
+				this->place[ start ]->y - this->place[ 0 ]->y );
+			delta = sqrt( locDest.x * locDest.x + locDest.y * locDest.y );
+		}
+		if( start != place.size() )
 		{
 			glColor3f( 0.0, 0.0, 0.0 );
 			glLineWidth( 0.5f );
-			glBegin( GL_LINES );
-				glVertex2f( this->center.x, this->center.y );
-				glVertex2f( this->destination.x, this->destination.y );
+			glBegin( GL_LINE_STRIP );
+			if( start == 1 )
+				glVertex2f( this->place[ 0 ]->x, this->place[ 0 ]->y );
+			for( unsigned int i = start; i < this->place.size(); ++i )
+				glVertex2f( this->place[ i ]->x, this->place[ i ]->y );
 			glEnd();
 		}
 	} //}}}
@@ -80,8 +89,8 @@ void Model::render() const
 		point != this->points.end(); ++point )
 	{
 		glVertex2f(
-			(*point)->r * cos( (*point)->theta + this->theta ) + this->center.x,
-			(*point)->r * sin( (*point)->theta + this->theta ) + this->center.y );
+			(*point)->r * cos( (*point)->theta + this->theta ) + this->place[ 0 ]->x,
+			(*point)->r * sin( (*point)->theta + this->theta ) + this->place[ 0 ]->y );
 	}
 	if( reflect )
 	{
@@ -89,8 +98,8 @@ void Model::render() const
 			point != this->points.rend(); ++point )
 		{
 			glVertex2f(
-				(*point)->r * cos( -(*point)->theta + this->theta ) + this->center.x,
-				(*point)->r * sin( -(*point)->theta + this->theta ) + this->center.y );
+				(*point)->r * cos( this->theta - (*point)->theta ) + this->place[ 0 ]->x,
+				(*point)->r * sin( this->theta - (*point)->theta ) + this->place[ 0 ]->y );
 		}
 	}
 	glEnd();
@@ -98,12 +107,25 @@ void Model::render() const
 
 void Model::update()
 { //{{{
-	RectangularPoint locDest(
-			this->destination.x - this->center.x,
-			this->destination.y - this->center.y );
-	long double delta = sqrt( locDest.x * locDest.x + locDest.y * locDest.y );
-	if( delta < 0.00001 && delta > -0.00001 )
+	if( this->place.size() < 2 )
 		return;
+
+	this->place[ 0 ]->x += this->velocity.x;
+	this->place[ 0 ]->y += this->velocity.y;
+
+	RectangularPoint locDest(
+			this->place[ 1 ]->x - this->place[ 0 ]->x,
+			this->place[ 1 ]->y - this->place[ 0 ]->y );
+	long double delta = sqrt( locDest.x * locDest.x + locDest.y * locDest.y );
+	// if we've gotten to the waypoint, delete it
+	if( delta < 10 && delta > -10 )
+	{
+		this->place.erase( ++this->place.begin() );
+		this->velocity.x = 0; this->velocity.y = 0;
+		// update again incase there is another one
+		this->update();
+	}
+
 	long double destinationTheta = acos( locDest.x / delta );
 	if( locDest.y < 0 )
 		destinationTheta = 2*PI - destinationTheta;
@@ -125,21 +147,41 @@ void Model::update()
 
 	this->velocity.x = locDest.x / 25.0f;
 	this->velocity.y = locDest.y / 25.0f;
+	// double the speed when within 25 of destination, and has a destination
+	// afterwards. This allows for smoothing animation when there are multiple
+	// way-points that this model must visit
+	if( this->place.size() > 2 && delta < 25 )
+	{
+		this->velocity.x *= 2.0f;
+		this->velocity.y *= 2.0f;
+	}
 
 	this->theta += this->radialVelocity;
 	while( this->theta > 2*PI )
 		this->theta -= 2*PI;
 	while( this->theta < 0 )
 		this->theta += 2*PI;
-
-	this->center.x += this->velocity.x;
-	this->center.y += this->velocity.y;
 } //}}}
 
-void Model::setDestination( long double iX, long double iY )
+void Model::setDestination( long double nX, long double nY )
 { //{{{
-	this->destination.x = iX;
-	this->destination.y = iY;
+	this->clearDestination();
+	this->place.push_back( new RectangularPoint( nX, nY ) );
+} //}}}
+
+void Model::addDestination( long double nX, long double nY )
+{ //{{{
+	this->place.push_back( new RectangularPoint( nX, nY ) );
+} //}}}
+
+void Model::clearDestination()
+{ //{{{
+	// don't delete the current place
+	while( this->place.size() > 1 )
+	{
+		delete this->place[ this->place.size() - 1 ];
+		this->place.pop_back();
+	}
 } //}}}
 
 void Model::buildModel()

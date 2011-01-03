@@ -95,7 +95,7 @@ int main( int argc, char** argv )
 				{
 					sf::Vector2f sCoords = mGame->ConvertCoords(
 							mEvent->MouseButton.X, mEvent->MouseButton.Y );
-					mModel.setDestination(
+					mModel.addDestination(
 						sCoords.x - (gWidth / 2.0f), sCoords.y - (gHeight / 2.0f) );
 				}
 			}
