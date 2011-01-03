@@ -34,6 +34,7 @@ using sf::RenderWindow;
 using sf::VideoMode;
 using sf::Event;
 using sf::Color;
+using sf::Input;
 
 #include "model.hpp"
 
@@ -48,6 +49,7 @@ int main( int argc, char** argv )
 		new RenderWindow(
 			VideoMode( gWidth, gHeight ), "sajranda", sf::Style::Close );
 	mGame->SetFramerateLimit( 60 );
+	const Input* mInput = &(mGame->GetInput());
 
 	Event* mEvent = new Event;
 	Model mModel;
@@ -86,6 +88,7 @@ int main( int argc, char** argv )
 			if( mEvent->Type == Event::Closed )
 				mGame->Close();
 
+			/*
 			if( mEvent->Type == Event::MouseButtonPressed )
 			{
 				if(( mEvent->MouseButton.X < 0 || mEvent->MouseButton.X > gWidth ) ||
@@ -99,6 +102,7 @@ int main( int argc, char** argv )
 						sCoords.x - (gWidth / 2.0f), sCoords.y - (gHeight / 2.0f) );
 				}
 			}
+			*/
 
 			if( mEvent->Type == Event::KeyPressed )
 			{
@@ -110,6 +114,18 @@ int main( int argc, char** argv )
 		}
 		if( !mGame->IsOpened() )
 			break;
+
+		if( mInput->IsMouseButtonDown( sf::Mouse::Right ) )
+		{
+			if(( mInput->GetMouseX() > 0 && mInput->GetMouseX() < gWidth ) &&
+				( mInput->GetMouseY() > 0 && mInput->GetMouseY() < gHeight ))
+			{
+				mModel.addDestination(
+					mInput->GetMouseX() - (gWidth / 2.0f),
+					mInput->GetMouseY() - (gHeight / 2.0f) );
+			}
+		}
+
 
 		mGame->Clear( Color::White );
 
