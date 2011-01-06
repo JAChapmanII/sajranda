@@ -1,0 +1,44 @@
+Implement a proper movement system
+	-- can only accelerate in direction of thrusters
+	-- must turn at an appropriate rate
+	-- speed should not be based on distance to target
+		-- maybe there will be some slow-down from cruise-speed near end though
+	-- path plotting? bezier on waypoints or something?
+		-- could use same system, but break path into multiple sub-points
+
+Implement a selection system
+	-- models have the start of this, needs UI imp.
+
+Needs data format to support multiple properties
+	-- acceleration rates on all axes
+	-- health/sheilds?/fuel?/armor?
+		-- regeneration rates
+	-- weapons
+		-- targeting
+			-- avoding
+
+Resources?
+	-- how many
+	-- how to get
+
+UI?
+	-- close
+	-- menus
+		-- main menu
+
+Factories
+	-- no 1, prebuilt unit
+
+Factions
+	-- story or premise?
+	-- set number of "main" factions or just unlimited?
+	-- set up own units
+		-- limited to certain number
+			-- units of factions you capture don't count
+		-- set design, thrusters
+			-- maybe make a unit that can only go forward
+			-- ones with omni-directional thrusters
+		-- unique abilities
+			-- based on design?
+			-- limited number that are assignable
+
