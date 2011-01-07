@@ -35,6 +35,8 @@ using sf::VideoMode;
 using sf::Event;
 using sf::Color;
 using sf::Input;
+using sf::Shape;
+using sf::Vector2f;
 
 #include "model.hpp"
 
@@ -81,6 +83,8 @@ int main( int argc, char** argv )
 		-1, 1 );
 	glMatrixMode( GL_MODELVIEW );
 
+	bool isSelecting = false;
+	Vector2f selectionStart, selectionEnd;
 	while( mGame->IsOpened() )
 	{
 		while( mGame->GetEvent( *mEvent ) )
@@ -115,6 +119,49 @@ int main( int argc, char** argv )
 		if( !mGame->IsOpened() )
 			break;
 
+		mGame->Clear( Color::White );
+
+		if( isSelecting )
+		{
+			if( ! mInput->IsMouseButtonDown( sf::Mouse::Left ) )
+			{
+				// select some stuff
+				isSelecting = false;
+			}
+			else
+			{
+				selectionEnd.x = mInput->GetMouseX() - (gWidth / 2.0f);
+				selectionEnd.y = mInput->GetMouseY() - (gHeight / 2.0f);
+
+				glColor3f( 0.9f, 0.9f, 1.0f );
+				glBegin( GL_QUADS );
+					glVertex2f( selectionStart.x, selectionStart.y );
+					glVertex2f( selectionStart.x, selectionEnd.y );
+					glVertex2f( selectionEnd.x, selectionEnd.y );
+					glVertex2f( selectionEnd.x, selectionStart.y );
+				glEnd();
+
+				glLineWidth( 3.0f );
+				glColor3f( 0.0f, 0.0f, 0.6f );
+				glBegin( GL_LINE_STRIP );
+					glVertex2f( selectionStart.x, selectionStart.y );
+					glVertex2f( selectionStart.x, selectionEnd.y );
+					glVertex2f( selectionEnd.x, selectionEnd.y );
+					glVertex2f( selectionEnd.x, selectionStart.y );
+					glVertex2f( selectionStart.x, selectionStart.y );
+				glEnd();
+			}
+		}
+		else
+		{
+			if( mInput->IsMouseButtonDown( sf::Mouse::Left ) )
+			{
+				selectionStart.x = mInput->GetMouseX() - (gWidth / 2.0f);
+				selectionStart.y = mInput->GetMouseY() - (gHeight / 2.0f);
+				isSelecting = true;
+			}
+		}
+
 		if( mInput->IsMouseButtonDown( sf::Mouse::Right ) )
 		{
 			if(( mInput->GetMouseX() > 0 && mInput->GetMouseX() < gWidth ) &&
@@ -125,9 +172,6 @@ int main( int argc, char** argv )
 					mInput->GetMouseY() - (gHeight / 2.0f) );
 			}
 		}
-
-
-		mGame->Clear( Color::White );
 
 		mModel.update();
 		mModel.render();
