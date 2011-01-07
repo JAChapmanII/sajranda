@@ -85,6 +85,24 @@ class Model
 		// clears all of this model's destinations
 		void clearDestination();
 
+		// returns this model's center x
+		long double centerX() const;
+
+		// returns this model's center y
+		long double centerY() const;
+
+		// sets this model's center
+		void setCenter( RectangularPoint nCenter );
+
+		// selects this model
+		void select();
+
+		// unselects this model
+		void unselect();
+
+		// returns the value of this->isSelected
+		bool isSelected() const;
+
 		// builds the display list for this model
 		void buildModel();
 
@@ -102,8 +120,8 @@ class Model
 		PlaceVector place;
 		RectangularPoint velocity;
 		ColorPoint color;
-		bool isSelected;
-		bool isBuilt;
+		bool selected;
+		bool built;
 		bool reflect;
 };
 

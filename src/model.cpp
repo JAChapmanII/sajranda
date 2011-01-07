@@ -47,8 +47,8 @@ Model::Model() :
 	place(),
 	velocity( 0.0, 0.0 ),
 	color( 0.0, 0.0, 0.0 ),
-	isSelected( true ),
-	isBuilt( false ),
+	selected( false ),
+	built( false ),
 	reflect( true )
 {
 	this->place.push_back( new RectangularPoint( 0.0f, 0.0f ) );
@@ -56,7 +56,7 @@ Model::Model() :
 
 void Model::render() const
 { //{{{
-	if( this->isSelected && this->place.size() > 1 )
+	if( this->selected && this->place.size() > 1 )
 	{ //{{{
 		unsigned int start = 0;
 		long double delta = 0;
@@ -183,6 +183,37 @@ void Model::clearDestination()
 		delete this->place[ this->place.size() - 1 ];
 		this->place.pop_back();
 	}
+} //}}}
+
+long double Model::centerX() const
+{ //{{{
+	return this->place[ 0 ]->x;
+} //}}}
+
+long double Model::centerY() const
+{ //{{{
+	return this->place[ 0 ]->y;
+} //}}}
+
+void Model::setCenter( RectangularPoint nCenter )
+{ //{{{
+	this->place[ 0 ]->x = nCenter.x;
+	this->place[ 0 ]->y = nCenter.y;
+} //}}}
+
+void Model::select()
+{ //{{{
+	this->selected = true;
+} //}}}
+
+void Model::unselect()
+{ //{{{
+	this->selected = false;
+} //}}}
+
+bool Model::isSelected() const
+{ //{{{
+	return this->selected;
 } //}}}
 
 void Model::buildModel()
