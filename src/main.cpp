@@ -29,6 +29,9 @@ using std::ofstream;
 #include <string>
 using std::string;
 
+#include <vector>
+using std::vector;
+
 #include <SFML/Graphics.hpp>
 using sf::RenderWindow;
 using sf::VideoMode;
@@ -43,6 +46,10 @@ using sf::Vector2f;
 #include "util.hpp"
 using util::fileExists;
 
+static const long double T_PI = 6.2831853071796;
+
+Model* createModel( string fileName );
+
 int main( int argc, char** argv )
 { //{{{
 	static const float gWidth = 960;
@@ -54,25 +61,17 @@ int main( int argc, char** argv )
 	const Input* mInput = &(mGame->GetInput());
 
 	Event* mEvent = new Event;
-	Model mModel;
-	string fileName = "dat/001";
-	if( fileExists( fileName + ".model" ) )
+	vector< Model* > models;
+	models.push_back( createModel( "dat/001" ) );
+	models.push_back( createModel( "dat/002" ) );
+	models.push_back( createModel( "dat/003" ) );
+	for( unsigned int i = 0; i < models.size(); ++i )
 	{
-		if( ! mModel.loadModel( fileName ) )
-		{
-			cerr << "It appears " << fileName << ".model is corrupt, recompiling" << endl;
-			Model::compileModel( fileName );
-			if( ! mModel.loadModel( fileName ) )
-			{
-				cerr << "Model is still bad" << endl;
-				return 1;
-			}
-		}
-	}
-	else if( ! mModel.loadModel( fileName ) )
-	{
-		cerr << "Model is bad" << endl;
-		return -1;
+		if( (models[ i ]) == NULL )
+			continue;
+		(models[ i ])->setCenter( Model::RectangularPoint(
+			75.0f * cos( i * T_PI / models.size() ),
+			75.0f * sin( i * T_PI / models.size() ) ) );
 	}
 
 	glMatrixMode( GL_PROJECTION );
@@ -92,22 +91,6 @@ int main( int argc, char** argv )
 			if( mEvent->Type == Event::Closed )
 				mGame->Close();
 
-			/*
-			if( mEvent->Type == Event::MouseButtonPressed )
-			{
-				if(( mEvent->MouseButton.X < 0 || mEvent->MouseButton.X > gWidth ) ||
-					( mEvent->MouseButton.Y < 0 || mEvent->MouseButton.Y > gHeight ))
-					continue;
-				if( mEvent->MouseButton.Button == sf::Mouse::Right )
-				{
-					sf::Vector2f sCoords = mGame->ConvertCoords(
-							mEvent->MouseButton.X, mEvent->MouseButton.Y );
-					mModel.addDestination(
-						sCoords.x - (gWidth / 2.0f), sCoords.y - (gHeight / 2.0f) );
-				}
-			}
-			*/
-
 			if( mEvent->Type == Event::KeyPressed )
 			{
 				if( mEvent->Key.Code == sf::Key::Escape )
@@ -124,12 +107,34 @@ int main( int argc, char** argv )
 		if( isSelecting )
 		{
 			if( ! mInput->IsMouseButtonDown( sf::Mouse::Left ) )
+			// selecting is done, mark selected/non
 			{
-				// select some stuff
+				long double x = 0, y = 0;
+				for( vector< Model* >::iterator i = models.begin();
+					i != models.end(); ++i )
+				{
+					if( (*i) == NULL )
+						continue;
+					x = (*i)->centerX();
+					y = (*i)->centerY();
+					// complicated test in case selectionStart and End are reversed
+					if((( selectionStart.x < x && x <= selectionEnd.x ) ||
+					 	( selectionEnd.x < x && x <= selectionStart.x )) &&
+						(( selectionStart.y < y && y <= selectionEnd.y ) ||
+						( selectionEnd.y < y && y <= selectionStart.y )))
+					{
+						(*i)->select();
+					}
+					else
+					{
+						(*i)->unselect();
+					}
+				}
 				isSelecting = false;
 			}
 			else
-			{
+			// update end point, draw selection rectangle
+			{ //{{{
 				selectionEnd.x = mInput->GetMouseX() - (gWidth / 2.0f);
 				selectionEnd.y = mInput->GetMouseY() - (gHeight / 2.0f);
 
@@ -150,7 +155,7 @@ int main( int argc, char** argv )
 					glVertex2f( selectionEnd.x, selectionStart.y );
 					glVertex2f( selectionStart.x, selectionStart.y );
 				glEnd();
-			}
+			} //}}}
 		}
 		else
 		{
@@ -167,17 +172,54 @@ int main( int argc, char** argv )
 			if(( mInput->GetMouseX() > 0 && mInput->GetMouseX() < gWidth ) &&
 				( mInput->GetMouseY() > 0 && mInput->GetMouseY() < gHeight ))
 			{
-				mModel.addDestination(
-					mInput->GetMouseX() - (gWidth / 2.0f),
-					mInput->GetMouseY() - (gHeight / 2.0f) );
+				for( vector< Model* >::iterator i = models.begin();
+					i != models.end(); ++i )
+				{
+					if( (*i) == NULL )
+						continue;
+
+					if( (*i)->isSelected() )
+						(*i)->addDestination(
+							mInput->GetMouseX() - (gWidth / 2.0f),
+							mInput->GetMouseY() - (gHeight / 2.0f) );
+				}
 			}
 		}
 
-		mModel.update();
-		mModel.render();
+		for( vector< Model* >::iterator i = models.begin(); i != models.end(); ++i )
+		{
+			if( (*i) == NULL )
+				continue;
+			(*i)->update();
+			(*i)->render();
+		}
 
 		mGame->Display();
 	}
 
+} //}}}
+
+Model* createModel( string fileName )
+{ //{{{
+	Model* rModel = new Model();
+	if( fileExists( fileName + ".model" ) )
+	{
+		if( ! rModel->loadModel( fileName ) )
+		{
+			cerr << "It appears " << fileName << ".model is corrupt, recompiling" << endl;
+			Model::compileModel( fileName );
+			if( ! rModel->loadModel( fileName ) )
+			{
+				cerr << "Model is still bad" << endl;
+				return NULL;
+			}
+		}
+	}
+	else if( ! rModel->loadModel( fileName ) )
+	{
+		cerr << "Model is bad" << endl;
+		return NULL;
+	}
+	return rModel;
 } //}}}
 
