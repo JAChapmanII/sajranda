@@ -108,7 +108,7 @@ int main( int argc, char** argv )
 		{
 			if( ! mInput->IsMouseButtonDown( sf::Mouse::Left ) )
 			// selecting is done, mark selected/non
-			{
+			{ //{{{
 				long double x = 0, y = 0;
 				for( vector< Model* >::iterator i = models.begin();
 					i != models.end(); ++i )
@@ -131,7 +131,7 @@ int main( int argc, char** argv )
 					}
 				}
 				isSelecting = false;
-			}
+			} //}}}
 			else
 			// update end point, draw selection rectangle
 			{ //{{{
@@ -167,7 +167,8 @@ int main( int argc, char** argv )
 			}
 		}
 
-		if( mInput->IsMouseButtonDown( sf::Mouse::Right ) )
+		// add waypoints to selected models
+		if( mInput->IsMouseButtonDown( sf::Mouse::Right ) ) //{{{
 		{
 			if(( mInput->GetMouseX() > 0 && mInput->GetMouseX() < gWidth ) &&
 				( mInput->GetMouseY() > 0 && mInput->GetMouseY() < gHeight ))
@@ -184,7 +185,7 @@ int main( int argc, char** argv )
 							mInput->GetMouseY() - (gHeight / 2.0f) );
 				}
 			}
-		}
+		} //}}}
 
 		for( vector< Model* >::iterator i = models.begin(); i != models.end(); ++i )
 		{
