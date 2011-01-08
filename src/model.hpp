@@ -103,6 +103,9 @@ class Model
 		// returns the value of this->isSelected
 		bool isSelected() const;
 
+		// returns the minum radius value of any of this's points
+		long double getMinimumRadius() const;
+
 		// builds the display list for this model
 		void buildModel();
 
@@ -123,6 +126,7 @@ class Model
 		bool selected;
 		bool built;
 		bool reflect;
+		long double minimumRadius;
 };
 
 #endif // MODEL_HPP

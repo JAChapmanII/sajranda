@@ -24,6 +24,9 @@ using std::string;
 using std::ifstream;
 using std::ofstream;
 
+#include <limits>
+using std::numeric_limits;
+
 #include <SFML/Window.hpp>
 
 #include <cmath>
@@ -49,7 +52,8 @@ Model::Model() :
 	color( 0.0, 0.0, 0.0 ),
 	selected( false ),
 	built( false ),
-	reflect( true )
+	reflect( true ),
+	minimumRadius( numeric_limits< long double >::infinity() )
 {
 	this->place.push_back( new RectangularPoint( 0.0f, 0.0f ) );
 } //}}}
@@ -264,6 +268,11 @@ bool Model::isSelected() const
 	return this->selected;
 } //}}}
 
+long double Model::getMinimumRadius() const
+{ //{{{
+	return this->minimumRadius;
+} //}}}
+
 void Model::buildModel()
 { //{{{
 } //}}}
@@ -408,6 +417,8 @@ bool Model::loadModel( string fileName )
 		}
 
 		this->points.push_back( new PolarPoint( ttheta * PI, r ) );
+		if( r < this->minimumRadius )
+			this->minimumRadius = r;
 	}
 
 	return true;
