@@ -6,9 +6,6 @@ Implement a proper movement system
 	-- path plotting? bezier on waypoints or something?
 		-- could use same system, but break path into multiple sub-points
 
-Implement a selection system
-	-- models have the start of this, needs UI imp.
-
 Needs data format to support multiple properties
 	-- acceleration rates on all axes
 	-- health/sheilds?/fuel?/armor?
@@ -41,4 +38,11 @@ Factions
 		-- unique abilities
 			-- based on design?
 			-- limited number that are assignable
+
+Optimize
+	Selection system
+		-- ~120 SLOC to do selection
+			-- invert some of the logic, or use a function pointer
+		-- seems there is a lot of redundancy
+		-- vector of what was selected, and just re-select it if shift is down?
 

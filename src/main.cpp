@@ -40,6 +40,7 @@ using sf::Color;
 using sf::Input;
 using sf::Shape;
 using sf::Vector2f;
+using sf::Clock;
 
 #include "model.hpp"
 
@@ -59,6 +60,7 @@ int main( int argc, char** argv )
 			VideoMode( gWidth, gHeight ), "sajranda", sf::Style::Close );
 	mGame->SetFramerateLimit( 60 );
 	const Input* mInput = &(mGame->GetInput());
+	Clock* mClock = new Clock();
 
 	Event* mEvent = new Event;
 	vector< Model* > models;
@@ -84,6 +86,7 @@ int main( int argc, char** argv )
 
 	bool isSelecting = false;
 	Vector2f selectionStart, selectionEnd;
+	long double selectionTimeStart = 0;
 	while( mGame->IsOpened() )
 	{
 		while( mGame->GetEvent( *mEvent ) )
@@ -110,6 +113,7 @@ int main( int argc, char** argv )
 			// selecting is done, mark selected/non
 			{ //{{{
 				long double x = 0, y = 0;
+				Vector2f offset;
 				for( vector< Model* >::iterator i = models.begin();
 					i != models.end(); ++i )
 				{
@@ -117,27 +121,65 @@ int main( int argc, char** argv )
 						continue;
 					x = (*i)->centerX();
 					y = (*i)->centerY();
-					// complicated test in case selectionStart and End are reversed
-					if((( selectionStart.x < x && x <= selectionEnd.x ) ||
-					 	( selectionEnd.x < x && x <= selectionStart.x )) &&
-						(( selectionStart.y < y && y <= selectionEnd.y ) ||
-						( selectionEnd.y < y && y <= selectionStart.y )))
+					Vector2f pointDifference = selectionStart - selectionEnd;
+					long double pointDistance = sqrt(
+							pointDifference.x*pointDifference.x +
+							pointDifference.y*pointDifference.y );
+					if(( mClock->GetElapsedTime() - selectionTimeStart > 0.250f ) ||
+						( pointDistance > 15.0f ))
 					{
-						if( mInput->IsKeyDown( sf::Key::LControl ) )
+						// complicated test in case selectionStart and End are reversed
+						if((( selectionStart.x < x && x <= selectionEnd.x ) ||
+					 		( selectionEnd.x < x && x <= selectionStart.x )) &&
+							(( selectionStart.y < y && y <= selectionEnd.y ) ||
+							( selectionEnd.y < y && y <= selectionStart.y )))
 						{
-							(*i)->unselect();
+							if( mInput->IsKeyDown( sf::Key::LControl ) )
+							{
+								(*i)->unselect();
+							}
+							else
+							{
+								(*i)->select();
+							}
 						}
 						else
 						{
-							(*i)->select();
+							if(!(mInput->IsKeyDown( sf::Key::LShift ) ||
+								mInput->IsKeyDown( sf::Key::LControl )))
+							{
+								(*i)->unselect();
+							}
 						}
 					}
 					else
 					{
-						if(!(mInput->IsKeyDown( sf::Key::LShift ) ||
-							mInput->IsKeyDown( sf::Key::LControl )))
+						offset.x = selectionStart.x - x;
+						offset.y = selectionStart.y - y;
+						long double distance =
+							sqrt( offset.x*offset.x + offset.y*offset.y );
+						if( distance < (*i)->getMinimumRadius() )
 						{
-							(*i)->unselect();
+							if( mInput->IsKeyDown( sf::Key::LControl ) )
+							{
+								(*i)->unselect();
+							}
+							else if( mInput->IsKeyDown( sf::Key::LShift ) )
+							{
+								(*i)->select();
+							}
+							else
+							{
+								for( vector< Model* >::iterator j = models.begin();
+									j != models.end(); ++j )
+								{
+									if( (*j) == NULL )
+										continue;
+									(*j)->unselect();
+								}
+								(*i)->select();
+							}
+							break;
 						}
 					}
 				}
@@ -174,6 +216,7 @@ int main( int argc, char** argv )
 			{
 				selectionStart.x = mInput->GetMouseX() - (gWidth / 2.0f);
 				selectionStart.y = mInput->GetMouseY() - (gHeight / 2.0f);
+				selectionTimeStart = mClock->GetElapsedTime();
 				isSelecting = true;
 			}
 		}
