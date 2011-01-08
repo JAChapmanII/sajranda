@@ -70,8 +70,8 @@ int main( int argc, char** argv )
 		if( (models[ i ]) == NULL )
 			continue;
 		(models[ i ])->setCenter( Model::RectangularPoint(
-			75.0f * cos( i * T_PI / models.size() ),
-			75.0f * sin( i * T_PI / models.size() ) ) );
+			225.0f * cos( i * T_PI / models.size() ),
+			225.0f * sin( i * T_PI / models.size() ) ) );
 	}
 
 	glMatrixMode( GL_PROJECTION );
@@ -123,11 +123,22 @@ int main( int argc, char** argv )
 						(( selectionStart.y < y && y <= selectionEnd.y ) ||
 						( selectionEnd.y < y && y <= selectionStart.y )))
 					{
-						(*i)->select();
+						if( mInput->IsKeyDown( sf::Key::LControl ) )
+						{
+							(*i)->unselect();
+						}
+						else
+						{
+							(*i)->select();
+						}
 					}
 					else
 					{
-						(*i)->unselect();
+						if(!(mInput->IsKeyDown( sf::Key::LShift ) ||
+							mInput->IsKeyDown( sf::Key::LControl )))
+						{
+							(*i)->unselect();
+						}
 					}
 				}
 				isSelecting = false;
