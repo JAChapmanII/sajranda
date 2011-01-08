@@ -82,6 +82,54 @@ void Model::render() const
 		}
 	} //}}}
 
+	// draw a selection line
+	if( this->selected ) //{{{
+	{
+		glLineWidth( 3.0f );
+		glBegin( GL_LINE_STRIP );
+		glColor3f( this->color.r * 0.6, this->color.g * 0.6, this->color.b * 0.6 );
+		for( PointVector::const_iterator point = this->points.begin();
+			point != this->points.end(); ++point )
+		{
+			glVertex2f(
+				0.9f * (*point)->r * cos( (*point)->theta + this->theta ) + this->place[ 0 ]->x,
+				0.9f * (*point)->r * sin( (*point)->theta + this->theta ) + this->place[ 0 ]->y );
+		}
+		if( reflect )
+		{
+			for( PointVector::const_reverse_iterator point = this->points.rbegin();
+				point != this->points.rend(); ++point )
+			{
+				glVertex2f(
+					0.9f * (*point)->r * cos( this->theta - (*point)->theta ) + this->place[ 0 ]->x,
+					0.9f * (*point)->r * sin( this->theta - (*point)->theta ) + this->place[ 0 ]->y );
+			}
+		}
+		glEnd();
+
+		glLineWidth( 3.0f );
+		glBegin( GL_LINE_STRIP );
+		glColor3f( this->color.r * 0.6, this->color.g * 0.6, this->color.b * 0.6 );
+		for( PointVector::const_iterator point = this->points.begin();
+			point != this->points.end(); ++point )
+		{
+			glVertex2f(
+				1.1f * (*point)->r * cos( (*point)->theta + this->theta ) + this->place[ 0 ]->x,
+				1.1f * (*point)->r * sin( (*point)->theta + this->theta ) + this->place[ 0 ]->y );
+		}
+		if( reflect )
+		{
+			for( PointVector::const_reverse_iterator point = this->points.rbegin();
+				point != this->points.rend(); ++point )
+			{
+				glVertex2f(
+					1.1f * (*point)->r * cos( this->theta - (*point)->theta ) + this->place[ 0 ]->x,
+					1.1f * (*point)->r * sin( this->theta - (*point)->theta ) + this->place[ 0 ]->y );
+			}
+		}
+		glEnd();
+	} //}}}
+
 	glLineWidth( 1.5f );
 	glBegin( GL_LINE_STRIP );
 	glColor3f( this->color.r, this->color.g, this->color.b );
