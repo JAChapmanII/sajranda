@@ -8,6 +8,7 @@ Implement a proper movement system
 
 Needs data format to support multiple properties
 	-- acceleration rates on all axes
+		-- thruster location/theta/strength
 	-- health/sheilds?/fuel?/armor?
 		-- regeneration rates
 	-- weapons
@@ -22,9 +23,12 @@ UI?
 	-- close
 	-- menus
 		-- main menu
+	-- zooming in/out
+	-- panning
+	-- view rotation
 
 Factories
-	-- no 1, prebuilt unit
+	-- different kinds for different classes of unit?
 
 Factions
 	-- story or premise?
@@ -39,10 +43,19 @@ Factions
 			-- based on design?
 			-- limited number that are assignable
 
+Logging
+	Is any needed? This early in the game probably not, but hard to retro-fit
+		-- or once it gets to some 'alpha' version, start putting in logging where
+		   it seems to crash, and leave it out everywhere else
+
 Optimize
 	Selection system
 		-- ~120 SLOC to do selection
 			-- invert some of the logic, or use a function pointer
 		-- seems there is a lot of redundancy
 		-- vector of what was selected, and just re-select it if shift is down?
+		-- UI portion of this
+			-- draws the model 3 times when selected, extra duplicated code
+				-- function to render with radius multiplier?
+			-- other way to signify as selected?
 
