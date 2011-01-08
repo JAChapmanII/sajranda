@@ -22,11 +22,26 @@ Running:
 	./bin/sajranda
 
 Usage:
-	There is not much to do right now. Currently though, there is a way to add
-	waypoints to the main ship's path. A new waypoint will be added whenever the
-	right mouse button is down. This means 60 per second will be added. About
-	1MiB of RAM will be taken up every 9 minutes through this process if no
-	waypoints are reached and deleted. Have fun :)
+	Currently there is not much to do. However, there is some crappy movement and
+	selection set up and ready to go.
+
+	Selecting:
+		LMB near (exact near-ness model dependant) the center of a model
+		LMB and drag over the centers of multiple models
+
+	There are also a few modifiers for the selection:
+		Left shift will add the unit(s) to the selection
+		Left control will deselect the unit(s)
+
+
+	Units move on the system of waypoints.
+	To add a waypoint to all selected units, use the right mouse button.
+
+	Holding the RMB will add multiple waypoints.
+		This means 60 per second will be added. This equate to relatively small
+		amounts of RAM being used, surprisingly. Here are some 1 unit figures:
+			Memory usage is about 1920 bytes per second
+			To use 1MiB of RAM, would require waypoints being added for 9 minutes
 
 File formats:
 	*.model
