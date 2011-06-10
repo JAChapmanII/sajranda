@@ -47,6 +47,8 @@ using sf::Clock;
 #include "util.hpp"
 using util::fileExists;
 
+#include <GL/gl.h>
+
 static const long double T_PI = 6.2831853071796;
 
 Model* createModel( string fileName );
@@ -89,7 +91,7 @@ int main( int argc, char** argv )
 	long double selectionTimeStart = 0;
 	while( mGame->IsOpened() )
 	{
-		while( mGame->GetEvent( *mEvent ) )
+		while( mGame->PollEvent( *mEvent ) )
 		{
 			if( mEvent->Type == Event::Closed )
 				mGame->Close();

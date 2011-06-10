@@ -39,6 +39,8 @@ using util::ldtob;
 using std::cerr;
 using std::endl;
 
+#include <GL/gl.h>
+
 static const long double T_PI = 6.2831853071796;
 static const long double PI = 3.1415926535898;
 static const long double PI_2 = 1.5707963267949;
