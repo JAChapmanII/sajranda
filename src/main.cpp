@@ -37,10 +37,13 @@ using sf::RenderWindow;
 using sf::VideoMode;
 using sf::Event;
 using sf::Color;
-using sf::Input;
 using sf::Shape;
 using sf::Vector2f;
+using sf::Vector2i;
 using sf::Clock;
+
+using sf::Keyboard;
+using sf::Mouse;
 
 #include "model.hpp"
 
@@ -48,6 +51,7 @@ using sf::Clock;
 using util::fileExists;
 
 #include <GL/gl.h>
+#include <cmath>
 
 static const long double T_PI = 6.2831853071796;
 
@@ -61,7 +65,6 @@ int main( int argc, char** argv )
 		new RenderWindow(
 			VideoMode( gWidth, gHeight ), "sajranda", sf::Style::Close );
 	mGame->SetFramerateLimit( 60 );
-	const Input* mInput = &(mGame->GetInput());
 	Clock* mClock = new Clock();
 
 	Event* mEvent = new Event;
@@ -88,8 +91,8 @@ int main( int argc, char** argv )
 
 	bool isSelecting = false;
 	Vector2f selectionStart, selectionEnd;
-	long double selectionTimeStart = 0;
-	while( mGame->IsOpened() )
+	float selectionTimeStart = 0;
+	while( mGame->IsOpen() )
 	{
 		while( mGame->PollEvent( *mEvent ) )
 		{
@@ -98,20 +101,21 @@ int main( int argc, char** argv )
 
 			if( mEvent->Type == Event::KeyPressed )
 			{
-				if( mEvent->Key.Code == sf::Key::Escape )
+				if( mEvent->Key.Code == Keyboard::Escape )
 				{
 					mGame->Close();
 				}
 			}
 		}
-		if( !mGame->IsOpened() )
+		if( !mGame->IsOpen() )
 			break;
 
 		mGame->Clear( Color::White );
+		Vector2i mousePosition = Mouse::GetPosition( *mGame );
 
 		if( isSelecting )
 		{
-			if( ! mInput->IsMouseButtonDown( sf::Mouse::Left ) )
+			if( ! Mouse::IsButtonPressed( sf::Mouse::Left ) )
 			// selecting is done, mark selected/non
 			{ //{{{
 				long double x = 0, y = 0;
@@ -127,7 +131,8 @@ int main( int argc, char** argv )
 					long double pointDistance = sqrt(
 							pointDifference.x*pointDifference.x +
 							pointDifference.y*pointDifference.y );
-					if(( mClock->GetElapsedTime() - selectionTimeStart > 0.250f ) ||
+					float secondsNow = mClock->GetElapsedTime().AsSeconds();
+					if(( secondsNow - selectionTimeStart > 0.250f ) ||
 						( pointDistance > 15.0f ))
 					{
 						// complicated test in case selectionStart and End are reversed
@@ -136,7 +141,7 @@ int main( int argc, char** argv )
 							(( selectionStart.y < y && y <= selectionEnd.y ) ||
 							( selectionEnd.y < y && y <= selectionStart.y )))
 						{
-							if( mInput->IsKeyDown( sf::Key::LControl ) )
+							if( Keyboard::IsKeyPressed( Keyboard::LControl ) )
 							{
 								(*i)->unselect();
 							}
@@ -147,8 +152,8 @@ int main( int argc, char** argv )
 						}
 						else
 						{
-							if(!(mInput->IsKeyDown( sf::Key::LShift ) ||
-								mInput->IsKeyDown( sf::Key::LControl )))
+							if(!(Keyboard::IsKeyPressed( Keyboard::LShift ) ||
+								Keyboard::IsKeyPressed( Keyboard::LControl )))
 							{
 								(*i)->unselect();
 							}
@@ -162,11 +167,11 @@ int main( int argc, char** argv )
 							sqrt( offset.x*offset.x + offset.y*offset.y );
 						if( distance < (*i)->getMinimumRadius() )
 						{
-							if( mInput->IsKeyDown( sf::Key::LControl ) )
+							if( Keyboard::IsKeyPressed( Keyboard::LControl ) )
 							{
 								(*i)->unselect();
 							}
-							else if( mInput->IsKeyDown( sf::Key::LShift ) )
+							else if( Keyboard::IsKeyPressed( Keyboard::LShift ) )
 							{
 								(*i)->select();
 							}
@@ -190,8 +195,8 @@ int main( int argc, char** argv )
 			else
 			// update end point, draw selection rectangle
 			{ //{{{
-				selectionEnd.x = mInput->GetMouseX() - (gWidth / 2.0f);
-				selectionEnd.y = mInput->GetMouseY() - (gHeight / 2.0f);
+				selectionEnd.x = mousePosition.x - (gWidth / 2.0f);
+				selectionEnd.y = mousePosition.y - (gHeight / 2.0f);
 
 				glColor3f( 0.9f, 0.9f, 1.0f );
 				glBegin( GL_QUADS );
@@ -214,20 +219,20 @@ int main( int argc, char** argv )
 		}
 		else
 		{
-			if( mInput->IsMouseButtonDown( sf::Mouse::Left ) )
+			if( Mouse::IsButtonPressed( sf::Mouse::Left ) )
 			{
-				selectionStart.x = mInput->GetMouseX() - (gWidth / 2.0f);
-				selectionStart.y = mInput->GetMouseY() - (gHeight / 2.0f);
-				selectionTimeStart = mClock->GetElapsedTime();
+				selectionStart.x = mousePosition.x - (gWidth / 2.0f);
+				selectionStart.y = mousePosition.y - (gHeight / 2.0f);
+				selectionTimeStart = mClock->GetElapsedTime().AsSeconds();
 				isSelecting = true;
 			}
 		}
 
 		// add waypoints to selected models
-		if( mInput->IsMouseButtonDown( sf::Mouse::Right ) ) //{{{
+		if( Mouse::IsButtonPressed( sf::Mouse::Right ) ) //{{{
 		{
-			if(( mInput->GetMouseX() > 0 && mInput->GetMouseX() < gWidth ) &&
-				( mInput->GetMouseY() > 0 && mInput->GetMouseY() < gHeight ))
+			if(( mousePosition.x > 0 && mousePosition.x < gWidth ) &&
+				( mousePosition.y > 0 && mousePosition.y < gHeight ))
 			{
 				for( vector< Model* >::iterator i = models.begin();
 					i != models.end(); ++i )
@@ -237,8 +242,8 @@ int main( int argc, char** argv )
 
 					if( (*i)->isSelected() )
 						(*i)->addDestination(
-							mInput->GetMouseX() - (gWidth / 2.0f),
-							mInput->GetMouseY() - (gHeight / 2.0f) );
+							mousePosition.x - (gWidth / 2.0f),
+							mousePosition.y - (gHeight / 2.0f) );
 				}
 			}
 		} //}}}

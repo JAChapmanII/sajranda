@@ -5,28 +5,26 @@ HEADERS=$(wildcard $(SRCDIR)/*.hpp)
 OBJS=$(SOURCES:.cpp=.o)
 EXEC=sajranda
 
-CC=g++
-CFLAGS=
+CXXFLAGS=
 
-LD=ld
-LFLAGS=
-LFLAGS+=-lsfml-graphics -lsfml-window -lsfml-system
+LDFLAGS=
+LDFLAGS+=-lsfml-graphics -lsfml-window -lsfml-system -lGL
 
 ifdef profile
-CFLAGS+=-pg
+CXXFLAGS+=-pg
 endif
 
 ifndef nowall
-CFLAGS+=-Wextra -pedantic -Wmain -Weffc++ -Wswitch-default -Wswitch-enum
-CFLAGS+=-Wmissing-include-dirs -Wmissing-declarations -Wunreachable-code
-CFLAGS+=-Winline -Wfloat-equal -Wundef -Wcast-align -Wredundant-decls
-CFLAGS+=-Winit-self -Wshadow
+CXXFLAGS+=-Wextra -pedantic -Wmain -Weffc++ -Wswitch-default -Wswitch-enum
+CXXFLAGS+=-Wmissing-include-dirs -Wmissing-declarations -Wunreachable-code
+CXXFLAGS+=-Winline -Wfloat-equal -Wundef -Wcast-align -Wredundant-decls
+CXXFLAGS+=-Winit-self -Wshadow
 endif
 
 ifdef release
-CFLAGS+=-O3 -s
+CXXFLAGS+=-O3 -s
 else
-CFLAGS+=-g
+CXXFLAGS+=-g
 endif
 
 all: $(EXEC)
@@ -35,10 +33,10 @@ full: $(EXEC)
 
 $(EXEC): $(OBJS)
 	mkdir -p $(BINDIR)
-	$(CC) -o $(BINDIR)/$(EXEC) $(LFLAGS) $?
+	$(CXX) -o $(BINDIR)/$(EXEC) $(LDFLAGS) $?
 
 %.o: %.cpp $(HEADERS)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 documentation:
 	mkdir -p $(DOCDIR)
