@@ -5,7 +5,7 @@ HEADERS=$(wildcard $(SRCDIR)/*.hpp)
 OBJS=$(SOURCES:.cpp=.o)
 EXEC=sajranda
 
-CXXFLAGS=
+CXXFLAGS=-std=c++0x
 
 LDFLAGS=
 LDFLAGS+=-lsfml-graphics -lsfml-window -lsfml-system -lGL

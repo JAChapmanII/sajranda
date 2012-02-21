@@ -120,8 +120,7 @@ int main( int argc, char** argv )
 			{ //{{{
 				long double x = 0, y = 0;
 				Vector2f offset;
-				for( vector< Model* >::iterator i = models.begin();
-					i != models.end(); ++i )
+				for( auto i = models.begin(); i != models.end(); ++i )
 				{
 					if( (*i) == NULL )
 						continue;
@@ -177,8 +176,7 @@ int main( int argc, char** argv )
 							}
 							else
 							{
-								for( vector< Model* >::iterator j = models.begin();
-									j != models.end(); ++j )
+								for( auto j = models.begin(); j != models.end(); ++j )
 								{
 									if( (*j) == NULL )
 										continue;
@@ -248,7 +246,7 @@ int main( int argc, char** argv )
 			}
 		} //}}}
 
-		for( vector< Model* >::iterator i = models.begin(); i != models.end(); ++i )
+		for( auto i = models.begin(); i != models.end(); ++i )
 		{
 			if( (*i) == NULL )
 				continue;
@@ -268,18 +266,19 @@ Model* createModel( string fileName )
 	{
 		if( ! rModel->loadModel( fileName ) )
 		{
-			cerr << "It appears " << fileName << ".model is corrupt, recompiling" << endl;
+			cerr << "createModel: " << fileName <<
+				".model is corrupt, recompiling" << endl;
 			Model::compileModel( fileName );
 			if( ! rModel->loadModel( fileName ) )
 			{
-				cerr << "Model is still bad" << endl;
+				cerr << "createModel: model is still bad" << endl;
 				return NULL;
 			}
 		}
 	}
 	else if( ! rModel->loadModel( fileName ) )
 	{
-		cerr << "Model is bad" << endl;
+		cerr << "createModel: model is bad" << endl;
 		return NULL;
 	}
 	return rModel;
