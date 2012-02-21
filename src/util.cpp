@@ -19,6 +19,7 @@
  */ //}}}
 #include "util.hpp"
 using std::string;
+#include <sys/stat.h>
 
 bool util::fileExists( string fileName )
 { //{{{

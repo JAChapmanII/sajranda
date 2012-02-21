@@ -232,8 +232,7 @@ int main( int argc, char** argv )
 			if(( mousePosition.x > 0 && mousePosition.x < gWidth ) &&
 				( mousePosition.y > 0 && mousePosition.y < gHeight ))
 			{
-				for( vector< Model* >::iterator i = models.begin();
-					i != models.end(); ++i )
+				for( auto i = models.begin(); i != models.end(); ++i )
 				{
 					if( (*i) == NULL )
 						continue;

@@ -94,8 +94,7 @@ void Model::render() const
 		glLineWidth( 3.0f );
 		glBegin( GL_LINE_STRIP );
 		glColor3f( this->color.r * 0.6, this->color.g * 0.6, this->color.b * 0.6 );
-		for( PointVector::const_iterator point = this->points.begin();
-			point != this->points.end(); ++point )
+		for( auto point = this->points.begin(); point != this->points.end(); ++point )
 		{
 			glVertex2f(
 				0.9f * (*point)->r * cos( (*point)->theta + this->theta ) + this->place[ 0 ]->x,
@@ -103,8 +102,7 @@ void Model::render() const
 		}
 		if( reflect )
 		{
-			for( PointVector::const_reverse_iterator point = this->points.rbegin();
-				point != this->points.rend(); ++point )
+			for( auto point = this->points.rbegin(); point != this->points.rend(); ++point )
 			{
 				glVertex2f(
 					0.9f * (*point)->r * cos( this->theta - (*point)->theta ) + this->place[ 0 ]->x,
@@ -116,8 +114,7 @@ void Model::render() const
 		glLineWidth( 3.0f );
 		glBegin( GL_LINE_STRIP );
 		glColor3f( this->color.r * 0.6, this->color.g * 0.6, this->color.b * 0.6 );
-		for( PointVector::const_iterator point = this->points.begin();
-			point != this->points.end(); ++point )
+		for( auto point = this->points.begin(); point != this->points.end(); ++point )
 		{
 			glVertex2f(
 				1.1f * (*point)->r * cos( (*point)->theta + this->theta ) + this->place[ 0 ]->x,
@@ -125,8 +122,7 @@ void Model::render() const
 		}
 		if( reflect )
 		{
-			for( PointVector::const_reverse_iterator point = this->points.rbegin();
-				point != this->points.rend(); ++point )
+			for( auto point = this->points.rbegin(); point != this->points.rend(); ++point )
 			{
 				glVertex2f(
 					1.1f * (*point)->r * cos( this->theta - (*point)->theta ) + this->place[ 0 ]->x,
@@ -139,8 +135,7 @@ void Model::render() const
 	glLineWidth( 1.5f );
 	glBegin( GL_LINE_STRIP );
 	glColor3f( this->color.r, this->color.g, this->color.b );
-	for( PointVector::const_iterator point = this->points.begin();
-		point != this->points.end(); ++point )
+	for( auto point = this->points.begin(); point != this->points.end(); ++point )
 	{
 		glVertex2f(
 			(*point)->r * cos( (*point)->theta + this->theta ) + this->place[ 0 ]->x,
@@ -148,8 +143,7 @@ void Model::render() const
 	}
 	if( reflect )
 	{
-		for( PointVector::const_reverse_iterator point = this->points.rbegin();
-			point != this->points.rend(); ++point )
+		for( auto point = this->points.rbegin(); point != this->points.rend(); ++point )
 		{
 			glVertex2f(
 				(*point)->r * cos( this->theta - (*point)->theta ) + this->place[ 0 ]->x,
@@ -287,8 +281,8 @@ bool Model::compileModel( string fileName )
 		return false;
 	}
 
-	ifstream inFile( (fileName + ".in").c_str() );
-	ofstream outFile( (fileName + ".model").c_str(), std::ios::binary );
+	ifstream inFile( (fileName + ".in") );
+	ofstream outFile( (fileName + ".model"), std::ios::binary );
 
 	char header = 0x00;
 	string firstWord;
@@ -374,7 +368,7 @@ bool Model::loadModel( string fileName )
 	}
 
 
-	ifstream inFile( (fileName + ".model").c_str(), std::ios::binary );
+	ifstream inFile( (fileName + ".model"), std::ios::binary );
 	char header = 0;
 	inFile.read( &header, 1 );
 

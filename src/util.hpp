@@ -21,7 +21,6 @@
 #define UTIL_HPP
 
 #include <string>
-#include <sys/stat.h>
 
 namespace util
 {
